@@ -48,7 +48,7 @@ type ExecutionArgsType = {
    rootValue?: any,
    fieldResolver?: (...args) => any,
    typeResolver?: typeof defaultTypeResolver,
-   operationName?: string; // Idk what this is for.
+   operationName?: string; // Idk what this is for
 }
 async function execute(args: ExecutionArgsType) {
    const {
