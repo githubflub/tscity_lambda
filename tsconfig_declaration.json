@@ -1,0 +1,12 @@
+{
+   "extends": "./tsconfig_base.json",
+   "include": ["src/lib/schema/*/typedef.ts"],
+   "compilerOptions": {
+
+      "module": "System",
+
+      "declaration": true,
+      "outFile": "../ui/schema_types/types.d.ts",
+      "emitDeclarationOnly": true
+   }
+}

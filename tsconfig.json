@@ -1,0 +1,9 @@
+{
+   "extends": "./tsconfig_base.json",
+   "include": ["src/**/*", "node_modules/@tscity/**/*"],
+
+   "compilerOptions": {
+      "module": "commonjs",
+      "resolveJsonModule": true,
+   }
+}
