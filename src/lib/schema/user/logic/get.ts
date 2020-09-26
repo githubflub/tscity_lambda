@@ -9,8 +9,10 @@ const defaultGetUserOptions = {
 
 export type GetUserOptionsType = Partial<typeof defaultGetUserOptions>
 
-export async function getUser({ username, id }: GetUserInputType, options: GetUserOptionsType = defaultGetUserOptions) {
-
+export async function getUser(
+   { username, id }: GetUserInputType,
+   options: GetUserOptionsType = defaultGetUserOptions
+) {
    const query: GetUserInputType = {}
    if (username) query.username = username;
    else if (id) query.id = id;
@@ -19,7 +21,7 @@ export async function getUser({ username, id }: GetUserInputType, options: GetUs
    const UserRepository = getConnection().getRepository<User>('User');
    const user = await UserRepository.findOneOrFail(query)
    // Filter out certain UserGroups.
-   user.groups = filterUserGroups(user.groups);
+   user.groups = filterUserGroups(user.groups, options);
 
    console.log('Found user \n', JSON.stringify(user, null, 2));
 

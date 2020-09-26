@@ -50,21 +50,47 @@ export class ThreadResolver {
 
    // For non-rooms only.
    @FieldResolver(type => [User], { nullable: true })
-   async users(@Root() thread: Thread) {
+   async users(@Ctx() context, @Root() thread: Thread) {
+      const identity = context.requester_identity;
+
+      // I only list users for DMs, so if this thread is a room,
+      // I don't need to do anything.
       if (thread.room) return null;
+
       if (thread.users) {
          console.log("Thread already has users! Returning!!")
-         return thread.users;
+
+         // I don't actually know if I need to, but I am
+         // filtering out requester here just in case.
+         const new_users = thread.users
+            .filter(user => user.id !== identity.id)
+
+         return new_users;
       }
 
+      // We are excluding the requester's id. It's
+      // a safe assumption that the requester already has
+      // their own user data already. Plus, this fixes a bug
+      // that I was having on the UI.
       const user_ids = thread.access_users
-      const query: FindManyOptions<User> = {
-         where: {
-            id: In(user_ids),
+         .filter(id => id !== identity.id)
+
+      let result = [];
+
+      // In the case of a self-DM, user_ids
+      // will be an empty array, which will
+      // cause an SQL error if we don't block it
+      // with this condition.
+      if (user_ids.length) {
+         const query: FindManyOptions<User> = {
+            where: {
+               id: In(user_ids),
+            }
          }
+
+         result = await listUser(query);
       }
 
-      const result = await listUser(query);
       return result;
    }
 
