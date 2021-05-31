@@ -17,6 +17,11 @@ export async function sendMessage(event, body) {
       return "sendMessage access denied: user not authenticated!";
    }
 
+   // Don't waste time if message content is not a string
+   if (typeof body?.payload?.content !== 'string') {
+      return "sendMessage access denied: message content must be a string!";
+   }
+
    const identity = event.requestContext.authorizer;
 
    await connectToDatabase();
@@ -39,6 +44,18 @@ export async function sendMessage(event, body) {
          groups: identity['groups'] // This needs to be thread specific
       }
    }
+
+   // Check for slash commands in message.
+   message_data.content = message_data.content.trim();
+   const COMMAND_REGEX = /^\/[\S]+/;
+   const match_result = message_data.content.match(COMMAND_REGEX)?.shift();
+   switch (match_result) {
+      case "/me": {
+         message_data.content = message_data.content.replace(/^\/me/, "").trim();
+         message_data.type = "me";
+      }
+   }
+
    const new_message = await createMessage(message_data);
    console.log('Your new message:', JSON.stringify(new_message, null, 2));
 

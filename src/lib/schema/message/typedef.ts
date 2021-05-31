@@ -46,6 +46,10 @@ export class Message extends BaseEntity {
    @Column({ nullable: false })
    content: string;
 
+   @Field({ nullable: true })
+   @Column({ type: "varchar", length: 32, nullable: true })
+   type?: "me" | "private";
+
    constructor(data: Partial<Message>) {
       super();
       Object.assign(this, {}, data)
