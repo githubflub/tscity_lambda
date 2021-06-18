@@ -255,7 +255,7 @@ export async function sendMessage(event, body) {
       // we need to get separate lists of room/user targets.
       // this is so we can query for relevant connections.
       const room_target_ids = []
-      const user_target_ids = []
+      const user_target_ids = [identity.id]
       message_data.targets
          .forEach(target => {
             switch (target.target_type) {
@@ -280,12 +280,10 @@ export async function sendMessage(event, body) {
          .createQueryBuilder("chat_connection")
          .leftJoinAndSelect("chat_connection.subscribed_threads", "subscribed_thread")
          .where(`(
-            ( subscribed_thread.id IN (:room_target_ids) )
-            OR
-            ( chat_connection.user_id IN (:user_target_ids) )
-            OR
-            ( chat_connection.user_id = :sender_id)
-         )`, { room_target_ids, user_target_ids, sender_id: identity.id })
+            ${room_target_ids.length? "( subscribed_thread.id IN (:room_target_ids) )" : ""}
+            ${(room_target_ids.length && user_target_ids.length)? "OR" : ""}
+            ${user_target_ids.length? "( chat_connection.user_id IN (:user_target_ids) )" : ""}
+         )`, { room_target_ids, user_target_ids })
          .getMany()
 
       result = await ApiGatewayManagementApi.postToAllConnections(post_data, undefined, some_connections)
