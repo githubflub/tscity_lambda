@@ -5,11 +5,11 @@ import { ChatSettings } from '../typedef'
 export async function getChatSettings(identity) {
    const rooms = await listRooms();
 
-   let primary_room = 'rooms';
+   let primary_room;
    let startup_rooms = [];
 
    (rooms || []).forEach(room => {
-      if (room.primary_room && primary_room === 'rooms') {
+      if (room.primary_room && !primary_room) {
          primary_room = room.id
       }
 

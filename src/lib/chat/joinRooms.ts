@@ -4,6 +4,7 @@ import { ApiGatewayManagementApi } from 'lib/chat/ApiGatewayManagementApi'
 import { getExistingChatConnection } from 'lib/chat/helpers/getExistingChatConnection'
 import { listChatUsers } from "lib/schema/user/logic/listChatUsers";
 import { listShortMessageHistory } from 'lib/schema/message/logic/list'
+import { Thread } from 'lib/schema/thread/typedef';
 
 
 export async function joinRooms(event, body) {
@@ -16,19 +17,26 @@ export async function joinRooms(event, body) {
 
    if (thread_ids && Array.isArray(thread_ids)) {
       const connection_id = event.requestContext.connectionId;
+      // identity will be undefined if requester is not logged in.
       const identity = event.requestContext.authorizer
+      console.log("identity", identity);
       await connectToDatabase();
 
       const existing_chat_connection = await getExistingChatConnection(event, 'joinRooms');
 
-      let subscribed_threads = (existing_chat_connection.subscribed_threads || []).map(item => item);
+      let subscribed_thread_ids = (existing_chat_connection?.subscribed_thread_ids || []).map(item => item);
 
       for (let i = 0; i < thread_ids.length; i++) {
-         subscribed_threads.push(thread_ids[i]);
+         subscribed_thread_ids.push(+thread_ids[i]);
       }
 
       // Dedupe
-      subscribed_threads = [ ...new Set(subscribed_threads) ]
+      subscribed_thread_ids = [ ...new Set(subscribed_thread_ids) ]
+
+      const subscribed_threads = subscribed_thread_ids
+         .map(subscribed_thread_id => {
+            return new Thread({ id: subscribed_thread_id })
+         })
 
       existing_chat_connection.subscribed_threads = subscribed_threads;
       const updated_chat_connection = new ChatConnection(existing_chat_connection);
@@ -44,7 +52,7 @@ export async function joinRooms(event, body) {
       const room_data = {}
       for (let i = thread_ids.length - 1; i >= 0; i--) {
          const thread_id = thread_ids[i]
-         const [users_online, messages] = await Promise.all( [listChatUsers(thread_id), listShortMessageHistory(thread_id)] );
+         const [users_online, messages] = await Promise.all( [listChatUsers(thread_id), listShortMessageHistory(thread_id, identity?.id)] );
 
          const room = {
             id: thread_id,

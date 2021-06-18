@@ -1,5 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm'
-import { ObjectType, Field, ID } from 'type-graphql';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToMany, JoinTable, RelationId, ManyToOne, JoinColumn } from 'typeorm'
+import { ObjectType, Field, ID, Int } from 'type-graphql';
+import { Thread } from '../thread/typedef';
+import { User } from '../user/typedef';
 console.log("CHAT_CONNECTION_IMPORTED")
 
 @ObjectType()
@@ -14,13 +16,30 @@ export class ChatConnection extends BaseEntity {
    @Column({ nullable: false, unique: true })
    connection_id: string;
 
-   @Field()
    @Column({ nullable: true })
    user_id: number;
 
-   @Field(type => [ID])
-   @Column('simple-array', { nullable: false })
-   subscribed_threads: number[]
+   @ManyToOne("User", "chat_connections")
+   @JoinColumn({ name: "user_id", referencedColumnName: "id" })
+   user: User;
+
+   @ManyToMany("Thread")
+   @JoinTable({
+      name: "connection_thread",
+      joinColumn: {
+         name: "connection_id",
+         referencedColumnName: "connection_id",
+      },
+      inverseJoinColumn: {
+         name: "thread_id",
+         referencedColumnName: "id"
+      }
+   })
+   subscribed_threads: Thread[];
+
+   @Field(type => [Int])
+   @RelationId("subscribed_threads")
+   subscribed_thread_ids: number[];
 
    constructor(data: Partial<ChatConnection>) {
       super();

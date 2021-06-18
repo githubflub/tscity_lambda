@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, BaseEntity } from 'typeorm'
-import { ObjectType, Field, ID } from 'type-graphql';
+import { ObjectType, Field, Int } from 'type-graphql';
 console.log("CHAT_SETTINGS_IMPORTED")
 
 @ObjectType()
@@ -10,15 +10,15 @@ export class ChatSettings extends BaseEntity {
    // settings to the UI (for unauthenticated users)
    // However, if someone wants to write to the DB,
    // they MUST include a user_id
-   @Field(type => ID, { nullable: true })
+   @Field(type => Int, { nullable: true })
    @PrimaryColumn()
-   user_id: string;
+   user_id: number;
 
-   @Field(type => String, { nullable: false })
-   @Column({ nullable: false, default: 'rooms' })
-   primary_room: string;
+   @Field(type => Int, { nullable: true })
+   @Column({ nullable: true })
+   primary_room: number;
 
-   @Field(type => [ID])
+   @Field(type => [Int])
    @Column('simple-json')
    startup_rooms: number[];
 

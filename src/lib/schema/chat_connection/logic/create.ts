@@ -1,5 +1,4 @@
 import { ChatConnection } from 'lib/schema/chat_connection/typedef';
-import { ChatConnectionInput } from '../input_type';
 
 export async function createChatConnection(chat_connection_data) {
 

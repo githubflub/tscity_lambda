@@ -6,7 +6,9 @@ module.exports = {
          {
             targets: {
                node: true,
-            }
+            },
+            // Fixes cancerous circular dependency issues with decorators.
+            modules: "commonjs"
          }
       ],
       '@babel/preset-typescript'

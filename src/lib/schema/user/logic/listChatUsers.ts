@@ -20,28 +20,19 @@ export async function listChatUsers(thread_id?: string) {
          return chat_users;
       }
 
-      // chat_users = await getConnection()
-      //    .query(`
-      //       SELECT user.id, user.username
-      //       FROM user
-      //       INNER JOIN chat_connection
-      //       ON user.id = chat_connection.user_id
-      //       WHERE find_in_set(:thread_id, chat_connection.subscribed_threads)
-      //       GROUP BY user.id
-      //    `, [thread_id] )
-
       chat_users = await getConnection()
          .getRepository(User)
          .createQueryBuilder("user")
          .select(['user.id', 'user.username', 'user.display_name', 'ug.id', 'ug.context', 'ug.context_id', 'ug.group', 'ug.user_id'])
+         .leftJoin("user.groups", "ug")
          .innerJoin(
             'chat_connection',
             'chat_connection',
             'user.id = chat_connection.user_id OR user.id = :moderator_id',
             { moderator_id: MODERATOR_USER_ID }
          )
-         .where(`find_in_set(:thread_id, chat_connection.subscribed_threads) OR user.id = :moderator_id`, { thread_id: `${thread_id}`, moderator_id: MODERATOR_USER_ID })
-         .leftJoin("user.groups", "ug")
+         .leftJoinAndSelect("chat_connection.subscribed_threads", "subscribed_thread")
+         .where(`(( subscribed_thread.id = :thread_id ) OR ( user.id = :moderator_id ))`, { thread_id: +thread_id, moderator_id: MODERATOR_USER_ID })
          .groupBy('user.id')
          .getMany()
 

@@ -4,6 +4,7 @@ import { FieldAuthGuard } from 'lib/auth/typegraphql_decorators/FieldAuthGuard'
 import Groups from 'lib/auth/groups'
 import { UserGroup } from '../UserGroup/typedef';
 import { TSBaseEntity } from '../TSBaseEntity/typedef'
+import { ChatConnection } from '../chat_connection/typedef';
 
 console.log("USER BEING IMPORTED")
 
@@ -56,8 +57,11 @@ export class User extends TSBaseEntity {
    phone_verified?: boolean;
 
    @Field(type => [UserGroup])
-   @OneToMany(type => UserGroup, user_group => user_group.user, { eager: true })
+   @OneToMany("UserGroup", "user", { eager: true })
    groups?: UserGroup[];
+
+   @OneToMany("ChatConnection", "user")
+   chat_connections?: ChatConnection[];
 
    constructor(data: Partial<User>) {
       super();

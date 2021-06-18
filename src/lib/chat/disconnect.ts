@@ -8,6 +8,7 @@ export async function disconnectClientFromChat(event) {
    await connectToDatabase();
 
    const identity = event.requestContext.authorizer;
+   console.log("identity", identity);
 
    const chat_connection_data = {
       connection_id: event.requestContext.connectionId,
@@ -19,33 +20,34 @@ export async function disconnectClientFromChat(event) {
    // The same client may have multiple connections.
    // so don't send a 'QUIT' message unless all
    // their connections have been closed.
+   if (identity) {
+      // Get array of connections?
+      const client_open_connections = await listChatConnections({ user_id: identity.id });
 
-
-   // Get array of connections?
-   const client_open_connections = await listChatConnections({ user_id: identity.id });
-
-   if (Array.isArray(client_open_connections) && client_open_connections.length) {
-      // Client has other authenticated connections open, so leave this one alone.
-   }
-   else {
-      // Only need to send messages if this
-      // was the connection of an authenticated user
-      // for now...
-      if (deleted_chat_connection.user_id) {
-         const ws_message = {
-            action: 'quit',
-            payload: {
-               user: {
-                  id: identity.id,
-                  username: identity['cognito:username']
-               },
-               subscribed_threads: deleted_chat_connection.subscribed_threads || []
+      if (Array.isArray(client_open_connections) && client_open_connections.length) {
+         // Client has other authenticated connections open, so leave this one alone.
+      }
+      else {
+         // Only need to send messages if this
+         // was the connection of an authenticated user
+         // for now...
+         if (deleted_chat_connection.user_id) {
+            const ws_message = {
+               action: 'quit',
+               payload: {
+                  user: {
+                     id: identity.id,
+                     username: identity['cognito:username']
+                  },
+                  subscribed_thread_ids: deleted_chat_connection.subscribed_thread_ids || []
+               }
             }
-         }
 
-         await ApiGatewayManagementApi.postToAllConnections(ws_message);
+            await ApiGatewayManagementApi.postToAllConnections(ws_message);
+         }
       }
    }
+
 
    return deleted_chat_connection
 }

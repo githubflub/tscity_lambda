@@ -1,23 +1,30 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToMany, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
-import { ObjectType, Field, ID } from 'type-graphql';
-import { FieldAuthGuard } from 'lib/auth/typegraphql_decorators/FieldAuthGuard'
-import Groups from 'lib/auth/groups'
-import { UserRoleType } from 'lib/schema/user/roles'
-import { PostModeType } from './post_modes'
-import { ThreadUserAccess } from '../ThreadUserAccess/typedef';
-import { User } from '../user/typedef';
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToMany, JoinColumn, ManyToMany, JoinTable, Index } from 'typeorm'
+import { ObjectType, Field, Int } from 'type-graphql';
+// import { FieldAuthGuard } from 'lib/auth/typegraphql_decorators/FieldAuthGuard'
+// import Groups from 'lib/auth/groups'
+// import { UserRoleType } from 'lib/schema/user/roles'
+// import { PostModeType } from './post_modes'
+// import { ThreadUserAccess } from '../ThreadUserAccess/typedef';
+// import { User } from '../user/typedef';
 console.log("THREAD_IMPORTED")
 
 @ObjectType() // Think of this as OutputType
 @Entity()
 export class Thread extends BaseEntity {
 
-   @Field(type => ID)
+   @Field(type => Int)
    @PrimaryGeneratedColumn()
-   id: string;
+   id: number;
 
-   @Field({ nullable: false })
-   @Column({ nullable: false, default: '' })
+   @Field({ nullable: true })
+   // Using @Index in addition to @Column allows me to make a column
+   // that requires unique values, but allows multiple nulls.
+   @Index({ unique: true, where: "internal_name IS NOT NULL" })
+   @Column({ nullable: true })
+   internal_name: string;
+
+   @Field({ nullable: true })
+   @Column({ nullable: true })
    display_name: string;
 
    @Field({ nullable: false })

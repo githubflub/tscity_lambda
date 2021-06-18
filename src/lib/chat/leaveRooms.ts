@@ -2,6 +2,7 @@ import { connectToDatabase } from 'lib/database/connectToDatabase'
 import { ChatConnection } from 'lib/schema/chat_connection/typedef'
 import { ApiGatewayManagementApi } from 'lib/chat/ApiGatewayManagementApi'
 import { getExistingChatConnection } from 'lib/chat/helpers/getExistingChatConnection'
+import { Thread } from 'lib/schema/thread/typedef';
 
 
 export async function leaveRooms(event, body) {
@@ -15,15 +16,21 @@ export async function leaveRooms(event, body) {
 
       const existing_chat_connection = await getExistingChatConnection(event, 'leaveRooms')
 
-      const new_threads_list = existing_chat_connection.subscribed_threads.filter(thread_id => {
-         if (thread_ids_to_remove.includes(thread_id)) {
-            return false;
-         }
+      const new_threads_list = existing_chat_connection.subscribed_thread_ids
+         .filter(thread_id => {
+            if (thread_ids_to_remove.includes(thread_id)) {
+               return false;
+            }
 
-         return true;
-      })
+            return true;
+         })
 
-      existing_chat_connection.subscribed_threads = new_threads_list;
+      const new_subscribed_threads = new_threads_list
+         .map(subscribed_thread_id => {
+            return new Thread({ id: subscribed_thread_id })
+         })
+
+      existing_chat_connection.subscribed_threads = new_subscribed_threads;
       const updated_chat_connection = new ChatConnection(existing_chat_connection);
 
       console.log("Updating this chat_connection", updated_chat_connection);

@@ -39,8 +39,9 @@ export class ThreadResolver {
    }
 
    @FieldResolver(type => [MessageUnion])
-   async messages(@Root() thread: Thread) {
-      return await listShortMessageHistory(thread.id)
+   async messages(@Root() thread: Thread, @Ctx() context) {
+      const identity = context.requester_identity;
+      return await listShortMessageHistory(thread.id, identity?.id)
    }
 
    @FieldResolver(type => [User])

@@ -1,5 +1,4 @@
 import { ChatConnection } from 'lib/schema/chat_connection/typedef';
-import { ChatConnectionInput } from '../input_type';
 
 export async function deleteChatConnection(chat_connection_data) {
 
@@ -10,6 +9,12 @@ export async function deleteChatConnection(chat_connection_data) {
    console.log("Existing ChatConnection", existing_chat_connection)
 
    const chat_connection_to_remove = new ChatConnection(existing_chat_connection)
+
+   // delete this connection's entries in the connection_thread table
+   chat_connection_to_remove.subscribed_threads = []
+   await chat_connection_to_remove.save()
+
+   // now delete the connection
    const removed_chat_connection = await chat_connection_to_remove.remove();
 
    console.log("Deleted this ChatConnection!\n", JSON.stringify(removed_chat_connection))

@@ -26,10 +26,10 @@ export class UserGroup extends TSBaseEntity {
 
    // The user that this permission applies to.
    @Field(type => Int)
-   @Column()
+   @Column({ nullable: false })
    user_id: number;
 
-   @ManyToOne(type => User, user => user.groups)
+   @ManyToOne("User", "groups")
    @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
    @Field(type => User)
    user: Promise<User>;

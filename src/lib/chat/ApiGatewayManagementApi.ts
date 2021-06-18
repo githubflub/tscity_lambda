@@ -1,6 +1,7 @@
 import AWS, { ApiGatewayManagementApi as oops } from 'aws-sdk'
 import { listChatConnections } from 'lib/schema/chat_connection/logic/list'
 import { deleteChatConnection } from 'lib/schema/chat_connection/logic/delete'
+import { ChatConnection } from 'lib/schema/chat_connection/typedef';
 
 
 let apigwManagementApi = undefined;
@@ -59,8 +60,13 @@ export const ApiGatewayManagementApi = {
    },
    postToConnection,
    // Assumes you're already connected to db
-   postToAllConnections: async (ws_message, onOriginConnection?: Function) => {
-      const chat_connections = await listChatConnections();
+   postToAllConnections: async (
+      ws_message,
+      onOriginConnection?: Function,
+      // if provided, posts to these connections.
+      connections?: ChatConnection[]
+      ) => {
+      const chat_connections = (Array.isArray(connections) && connections) || await listChatConnections();
       const post_calls = chat_connections.map(async (chat_connection) => {
          const { connection_id } = chat_connection;
          let proceed = true

@@ -14,7 +14,7 @@ import { listChatUsers } from './logic/listChatUsers'
 import { getUser } from './logic/get'
 import { updateUser } from './logic/update'
 import { ResolverAuthGuard } from 'lib/auth/typegraphql_decorators/ResolverAuthGuard'
-import { FindManyOptions } from "typeorm";
+import { FindManyOptions, getConnection } from "typeorm";
 import { attachIoTPolicy } from 'lib/iot/attachIoTPolicy'
 import { listEntity } from "lib/database/logic/listEntity";
 
@@ -132,4 +132,32 @@ export class UserResolver {
 
       return await updateUser(identity, user_data);
    }
+
+
+   // @Query(return_type => String)
+   // async testListChatUsers() {
+   //    const MODERATOR_USER_ID = process.env.MODERATOR_USER_ID
+   //    console.log("MODERATOR_USER_ID", MODERATOR_USER_ID)
+
+   //    const chat_users = await getConnection()
+   //       .getRepository(User)
+   //       .createQueryBuilder("user")
+   //       .select(['user.id', 'user.username', 'user.display_name', 'ug.id', 'ug.context', 'ug.context_id', 'ug.group', 'ug.user_id'])
+   //       .leftJoin("user.groups", "ug")
+   //       .innerJoin(
+   //          'chat_connection',
+   //          'chat_connection',
+   //          'user.id = chat_connection.user_id OR user.id = :moderator_id',
+   //          { moderator_id: MODERATOR_USER_ID }
+   //       )
+   //       .leftJoinAndSelect("chat_connection.subscribed_threads", "subscribed_thread")
+   //       .where(`(( subscribed_thread.id = :thread_id ) OR ( user.id = :moderator_id ))`, { thread_id: 1, moderator_id: MODERATOR_USER_ID })
+   //       .groupBy('user.id')
+   //       .getMany()
+
+   //    console.log("chat_users")
+   //    console.log(JSON.stringify(chat_users, null, 2))
+
+   //    return "hello from UserResolver!"
+   // }
 }

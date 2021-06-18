@@ -10,6 +10,7 @@ import { IoTSubtopics } from "@tscity/shared/iot/subtopics";
 import { SEND_DM } from '@tscity/shared/graphql/mutation/SEND_DM'
 import { fakeql } from 'lib/fakeql/fakeql'
 import { withBlockGate } from 'lib/schema/Block/logic/withBlockGate'
+import { MessageSenderGroup } from "lib/schema/MessageSenderGroup/typedef";
 
 export async function sendDM(
    identity: IdentityType,
@@ -67,15 +68,36 @@ export async function sendDM(
 
    try {
       const message = validateMessage(content);
+      let sender_groups = [];
+      for (let i = 0; i < (identity.groups || []).length; i++) {
+         const group = identity.groups?.[i]
+         if (group) {
+            const sender_group = new MessageSenderGroup({
+               context: group.context,
+               context_id: group.context_id,
+               group: group.group,
+               user_id: group.user_id
+            })
+
+            await sender_group.save()
+            sender_groups.push(sender_group)
+         }
+      }
       const new_message = await createMessage({
+         sender_id: identity.id,
+         sender_username: identity['cognito:username'],
+         sender_display_name: identity.display_name,
+         sender_groups,
          sender: {
             id: identity.id,
             username: identity['cognito:username'],
-            display_name: identity['display_name'],
-            groups: identity['groups'] // This needs to be thread specific
+            display_name: identity.display_name,
+            groups: identity.groups // This needs to be thread specific
          },
+         origin_thread_id: thread.id,
          thread_id: thread.id,
          content: message,
+         threads: [thread],
       })
 
       const result = {

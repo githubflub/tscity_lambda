@@ -11,6 +11,8 @@ import { ChatConnection } from 'lib/schema/chat_connection/typedef'
 import { ChatSettings } from 'lib/schema/ChatSettings/typedef'
 import { FriendRequest } from 'lib/schema/FriendRequest/typedef'
 import { Message } from 'lib/schema/message/typedef'
+import { MessageTarget } from 'lib/schema/MessageTarget/typedef'
+import { MessageSenderGroup } from 'lib/schema/MessageSenderGroup/typedef'
 import { Thread } from 'lib/schema/thread/typedef'
 import { ThreadRead } from 'lib/schema/ThreadRead/typedef'
 import { ThreadSilence } from 'lib/schema/ThreadSilence/typedef'
@@ -54,6 +56,8 @@ export async function connectToDatabase() {
          ChatSettings,
          FriendRequest,
          Message,
+         MessageTarget,
+         MessageSenderGroup,
          Profile,
          Thread,
          ThreadRead,
@@ -65,7 +69,7 @@ export async function connectToDatabase() {
       // subscribers: [DatabaseUpdateHook],
       synchronize: true,
       timezone: 'Z',
-      logging: process.env.IS_OFFLINE? true : false, // I never read these anyway.
+      logging: process.env.IS_OFFLINE? false : false, // I never read these anyway.
    }
 
    // console.log('connection_options', connection_options)
