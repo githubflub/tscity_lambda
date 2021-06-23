@@ -1,18 +1,14 @@
 import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToMany, JoinTable, RelationId, ManyToOne, JoinColumn } from 'typeorm'
-import { ObjectType, Field, ID, Int } from 'type-graphql';
 import { Thread } from '../thread/typedef';
 import { User } from '../user/typedef';
 console.log("CHAT_CONNECTION_IMPORTED")
 
-@ObjectType()
 @Entity()
 export class ChatConnection extends BaseEntity {
 
-   @Field(type => ID)
    @PrimaryGeneratedColumn()
-   id: string;
+   id: number;
 
-   @Field()
    @Column({ nullable: false, unique: true })
    connection_id: string;
 
@@ -37,7 +33,6 @@ export class ChatConnection extends BaseEntity {
    })
    subscribed_threads: Thread[];
 
-   @Field(type => [Int])
    @RelationId("subscribed_threads")
    subscribed_thread_ids: number[];
 

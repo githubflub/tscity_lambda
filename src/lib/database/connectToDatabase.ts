@@ -19,6 +19,7 @@ import { ThreadSilence } from 'lib/schema/ThreadSilence/typedef'
 import { ThreadUserAccess } from 'lib/schema/ThreadUserAccess/typedef'
 import { Profile } from 'lib/schema/Profile/typedef'
 import { UserGroup } from 'lib/schema/UserGroup/typedef'
+import { IpAddress } from 'lib/schema/IpAddress/typedef'
 
 // Subscribers
 // import { DatabaseUpdateHook } from 'lib/elasticsearch/DatabaseUpdateHook'
@@ -55,6 +56,7 @@ export async function connectToDatabase() {
          ChatConnection,
          ChatSettings,
          FriendRequest,
+         IpAddress,
          Message,
          MessageTarget,
          MessageSenderGroup,

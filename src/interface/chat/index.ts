@@ -31,7 +31,8 @@ export async function handler(event, context) {
 
 
    // Parse identity from custom authorizer result.
-   console.log('ws event before fixing identity:', JSON.stringify(event, null, 2))
+   console.log('WS EVENT BEFORE FIXING IDENTITY')
+   console.log(JSON.stringify(event))
    if (event.requestContext.authorizer && event.requestContext.authorizer.identity) {
       const identity = JSON.parse(Buffer.from(event.requestContext.authorizer.identity, 'base64').toString())
       delete event.requestContext.authorizer.identity
@@ -49,7 +50,8 @@ export async function handler(event, context) {
    }
 
    console.log(message);
-   console.log('ws event:', JSON.stringify(event, null, 2))
+   console.log("WS EVENT AFTER FIXING IDENTITY")
+   console.log(JSON.stringify(event))
 
    let response = {
       statusCode: 418,

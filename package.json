@@ -6,7 +6,7 @@
     "tsc": "tsc --project tsconfig_declaration.json && echo hello"
   },
   "dependencies": {
-    "@tscity/shared": "git://github.com/githubflub/tscity_shared.git",
+    "@tscity/shared": "git://github.com/githubflub/tscity_shared.git#master",
     "apollo-server-lambda": "2.11.0",
     "aws-sdk": "2.711.0",
     "axios": "0.19.0",

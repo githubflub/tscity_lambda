@@ -2,36 +2,12 @@ import { getCognitoPublicKeys } from 'lib/cognito/getCognitoPublicKeys'
 import { promisify } from 'util'
 import jsonwebtoken from 'jsonwebtoken'
 
-import { connectToDatabase } from 'lib/database/connectToDatabase'
-import { getUser } from 'lib/schema/user/logic/get'
-import { CustomAuthorizerResult } from 'aws-lambda'
-
 const TS_AWS_REGION = process.env.TS_AWS_REGION
 const USER_POOL_ID = process.env.USER_POOL_ID
 const verifyPromised = promisify(jsonwebtoken.verify.bind(jsonwebtoken));
 
-export async function validateCognitoToken(request) {
-   const {
-      body: {
-         token,
-         methodArn,
-         graphql_endpoint,
-      }
-   } = request
-
-   const auth_response: CustomAuthorizerResult = {
-      principalId: "lurker",
-      policyDocument: {
-         Version: '2012-10-17',
-         Statement: [
-            {
-               "Action": "execute-api:Invoke",
-               "Effect": "Allow",
-               "Resource": methodArn,
-            }
-         ]
-      }
-   };
+export async function validateCognitoToken(token) {
+   let claim
 
    try {
       if (!TS_AWS_REGION || !USER_POOL_ID) {
@@ -69,32 +45,10 @@ export async function validateCognitoToken(request) {
       }
 
       console.log(`claim confirmed for ${claim['cognito:username']}`);
-      let user = undefined;
-      if (!!claim['cognito:username']) {
-         if (!graphql_endpoint) {
-            // If this breaks while using serverless offline,
-            // run sls offline with --noAuth
-            await connectToDatabase();
-            user = await getUser({ username: claim['cognito:username'] })
-         }
-         auth_response.principalId = claim['cognito:username']
-      }
-
-      const identity = {
-         ...user,
-         ...claim,
-      }
-
-      // Base64 encode this to avoid pain and suffering...
-      // The context object only really works with string values
-      // on its properties.
-      auth_response.context = {
-         identity: Buffer.from(JSON.stringify(identity)).toString('base64'),
-      }
    }
    catch (error) {
       console.log('ERROR: validateCognitoToken - ', error)
    }
 
-   return auth_response;
+   return claim
 }

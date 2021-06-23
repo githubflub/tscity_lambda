@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryColumn, BaseEntity } from 'typeorm'
-import { ObjectType, Field, ID } from 'type-graphql';
 
 console.log("THREAD_SILENCE_IMPORTED")
 
@@ -7,10 +6,10 @@ console.log("THREAD_SILENCE_IMPORTED")
 export class ThreadSilence extends BaseEntity {
 
    @PrimaryColumn()
-   thread_id: string;
+   thread_id: number;
 
    @PrimaryColumn()
-   user_id: string;
+   user_id: number;
 
    @Column({ nullable: true, default: () => 'null'}) // null value means perma silenced
    expires: Date;

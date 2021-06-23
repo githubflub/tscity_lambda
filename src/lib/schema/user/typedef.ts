@@ -1,10 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, RelationId, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
 import { ObjectType, Field, Int } from 'type-graphql';
 import { FieldAuthGuard } from 'lib/auth/typegraphql_decorators/FieldAuthGuard'
 import Groups from 'lib/auth/groups'
 import { UserGroup } from '../UserGroup/typedef';
 import { TSBaseEntity } from '../TSBaseEntity/typedef'
 import { ChatConnection } from '../chat_connection/typedef';
+import { UserIpAddress } from '../UserIpAddress/typedef';
+import { RelationIdAttribute } from 'typeorm/query-builder/relation-id/RelationIdAttribute';
 
 console.log("USER BEING IMPORTED")
 
@@ -62,6 +64,23 @@ export class User extends TSBaseEntity {
 
    @OneToMany("ChatConnection", "user")
    chat_connections?: ChatConnection[];
+
+   @ManyToMany("IpAddress")
+   @JoinTable({
+      name: "user_ip_address",
+      joinColumn: {
+         name: "user_id",
+         referencedColumnName: "id",
+      },
+      inverseJoinColumn: {
+         name: "ip_address",
+         referencedColumnName: "ip_address"
+      }
+   })
+   user_ip_addresses?: UserIpAddress[];
+
+   @RelationId("user_ip_addresses")
+   ip_addresses: string[];
 
    constructor(data: Partial<User>) {
       super();

@@ -10,7 +10,7 @@ console.log("MESSAGE_IMPORTED")
 @Entity()
 export class Message extends BaseEntity {
 
-   @Field(type => ID)
+   @Field(type => Int)
    @PrimaryGeneratedColumn()
    id: number;
 
