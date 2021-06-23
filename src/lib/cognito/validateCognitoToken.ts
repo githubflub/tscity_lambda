@@ -30,7 +30,7 @@ export async function validateCognitoToken(token) {
          throw new Error('claim made for unknown key id')
       }
 
-      const claim = await verifyPromised(token, key.pem);
+      claim = await verifyPromised(token, key.pem);
       const current_seconds = Math.floor((new Date()).valueOf() / 1000);
       console.log("CLAIM:")
       console.log(claim)

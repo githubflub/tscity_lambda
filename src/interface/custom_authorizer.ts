@@ -6,7 +6,9 @@ import { getUser } from 'lib/schema/user/logic/get'
 import { User } from 'lib/schema/user/typedef';
 
 export async function handler2(event, context, callback) {
-   console.log('Custom authorizer event:', JSON.stringify(event))
+   console.log("CUSTOM AUTHORIZER EVENT:")
+   console.log(JSON.stringify(event))
+
    const {
       methodArn,
       queryStringParameters: { token } = { token: 'lurkertoken' },
@@ -18,6 +20,10 @@ export async function handler2(event, context, callback) {
    // serverless-offline issues make it important to know
    // which endpoint i'm currently authorizing.
    const is_authorizing_for_websocket = !!authorizationToken;
+   let endpoint_type = is_authorizing_for_websocket
+      ? "websocket"
+      : "http"
+   console.log("Running custom authorizer for", endpoint_type)
 
    // This is so I can be lazy and not close my database connection?
    context.callbackWaitsForEmptyEventLoop = false;
@@ -49,8 +55,8 @@ export async function handler2(event, context, callback) {
             // If this breaks while using serverless offline,
             // run sls offline with --noAuth
             await connectToDatabase()
+            // Returns an instance of User
             user = await getUser({ username: user_data['cognito:username'] })
-            console.log("user is instance of User?", user instanceof User)
             await trackUserIpAddress(event, user)
          }
          auth_response.principalId = user_data['cognito:username']
