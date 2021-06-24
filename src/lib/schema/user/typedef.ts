@@ -5,8 +5,7 @@ import Groups from 'lib/auth/groups'
 import { UserGroup } from '../UserGroup/typedef';
 import { TSBaseEntity } from '../TSBaseEntity/typedef'
 import { ChatConnection } from '../chat_connection/typedef';
-import { UserIpAddress } from '../UserIpAddress/typedef';
-import { RelationIdAttribute } from 'typeorm/query-builder/relation-id/RelationIdAttribute';
+import { IpAddress } from '../IpAddress/typedef';
 
 console.log("USER BEING IMPORTED")
 
@@ -77,7 +76,7 @@ export class User extends TSBaseEntity {
          referencedColumnName: "ip_address"
       }
    })
-   user_ip_addresses?: UserIpAddress[];
+   user_ip_addresses?: IpAddress[];
 
    @RelationId("user_ip_addresses")
    ip_addresses: string[];

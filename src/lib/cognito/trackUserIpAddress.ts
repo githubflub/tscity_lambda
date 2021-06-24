@@ -4,6 +4,7 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { IpAddress } from "lib/schema/IpAddress/typedef";
 import { User } from "lib/schema/user/typedef";
+import { updateUser } from "lib/schema/user/logic/update"
 
 export async function trackUserIpAddress(event: APIGatewayProxyEvent, user: User) {
    const ip_address = event?.requestContext?.identity?.sourceIp;
@@ -29,6 +30,7 @@ export async function trackUserIpAddress(event: APIGatewayProxyEvent, user: User
       ip_address_entities.push(ip_address_entity)
 
       user.user_ip_addresses = ip_address_entities;
-      await user.save();
+      delete user.display_name // quickly fix some behavior.
+      await updateUser({}, user);
    }
 }
