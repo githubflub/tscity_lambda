@@ -19,7 +19,7 @@ export async function handler2(event, context, callback) {
    // websocket endpoint and my http endpoint.
    // serverless-offline issues make it important to know
    // which endpoint i'm currently authorizing.
-   const is_authorizing_for_websocket = !!authorizationToken;
+   const is_authorizing_for_websocket = !authorizationToken;
    let endpoint_type = is_authorizing_for_websocket
       ? "websocket"
       : "http"
